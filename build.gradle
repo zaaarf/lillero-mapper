@@ -1,0 +1,27 @@
+plugins {
+    id 'java-library'
+    id 'com.palantir.git-version' version '0.13.0'
+}
+
+archivesBaseName = 'lll-mapper'
+version = gitVersion()
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+	withSourcesJar()
+	withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+	maven { url = 'https://maven.fantabos.co' }
+}
+
+dependencies {
+	implementation 'ftbsc:lll:0.4.1'
+}
+
+jar {
+    archiveFileName = "${jar.archiveBaseName.get()}-${project.version.split('-')[0]}.${jar.archiveExtension.get()}"
+}

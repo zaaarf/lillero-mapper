@@ -5,6 +5,10 @@ import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.tools.DescriptorBuilder;
 import org.objectweb.asm.Type;
 
+/**
+ * A collection of static utility methods correlated to
+ * mappers.
+ */
 public class MappingUtils {
 	/**
 	 * Obfuscates a method descriptor, replacing its class references

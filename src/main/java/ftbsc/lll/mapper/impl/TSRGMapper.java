@@ -1,5 +1,6 @@
 package ftbsc.lll.mapper.impl;
 
+import com.google.auto.service.AutoService;
 import ftbsc.lll.exceptions.MappingNotFoundException;
 import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.mapper.tools.ClassData;
@@ -11,6 +12,8 @@ import java.util.Map;
  * Parses a .tsrg file into a mapper capable of converting from
  * plain names to obfuscated ones and vice versa.
  */
+
+@AutoService(IMapper.class)
 public class TSRGMapper implements IMapper {
 
 	/**

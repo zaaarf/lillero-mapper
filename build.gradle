@@ -3,7 +3,7 @@ plugins {
     id 'com.palantir.git-version' version '0.13.0'
 }
 
-archivesBaseName = 'lll-mapper'
+archivesBaseName = 'mapper'
 version = gitVersion()
 
 java {
@@ -19,7 +19,9 @@ repositories {
 }
 
 dependencies {
-	implementation 'ftbsc:lll:0.4.1'
+	implementation 'ftbsc:lll:0.4.2'
+	implementation 'com.google.auto.service:auto-service-annotations:1.1.0'
+	annotationProcessor 'com.google.auto.service:auto-service:1.1.0'
 }
 
 jar {

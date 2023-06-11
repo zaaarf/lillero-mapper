@@ -10,6 +10,7 @@ public class MappingUtils {
 	 * Obfuscates a method descriptor, replacing its class references
 	 * with their obfuscated counterparts.
 	 * @param descriptor a {@link String} containing the descriptor
+	 * @param mapper the {@link IMapper} to use for the process
 	 * @return the obfuscated descriptor
 	 */
 	public static String obfuscateMethodDescriptor(String descriptor, IMapper mapper) {
@@ -28,6 +29,7 @@ public class MappingUtils {
 	 * Given a {@link Type} and a valid {@link IMapper} it returns its obfuscated
 	 * counterpart.
 	 * @param type the type in question
+	 * @param mapper the {@link IMapper} to use for the process
 	 * @return the obfuscated type
 	 */
 	public static Type obfuscateType(Type type, IMapper mapper) {

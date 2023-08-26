@@ -42,7 +42,7 @@ public abstract class AbstractMapper implements IMapper {
 
 
 	@Override
-	public ClassData getClassData(String name)  {
+	public ClassData getClassData(String name) throws MappingNotFoundException {
 		ClassData data = this.mappings.get(name.replace('.', '/'));
 		if(data == null)
 			throw new MappingNotFoundException("class", name);
@@ -50,7 +50,7 @@ public abstract class AbstractMapper implements IMapper {
 	}
 
 	@Override
-	public MethodData getMethodData(String parent, String name, String descriptor) {
+	public MethodData getMethodData(String parent, String name, String descriptor) throws MappingNotFoundException {
 		return this.getClassData(parent).mapMethod(name, descriptor);
 	}
 

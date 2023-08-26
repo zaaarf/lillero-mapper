@@ -2,11 +2,14 @@ package ftbsc.lll.mapper;
 
 import ftbsc.lll.exceptions.MalformedMappingsException;
 import ftbsc.lll.exceptions.MappingNotFoundException;
+import ftbsc.lll.mapper.tools.data.ClassData;
+import ftbsc.lll.mapper.tools.data.FieldData;
+import ftbsc.lll.mapper.tools.data.MethodData;
 
 import java.util.*;
 
 /**
- * A generic obfuscation mapper.
+ * The shared interface between all mappers.
  */
 public interface IMapper {
 	/**
@@ -37,44 +40,41 @@ public interface IMapper {
 	void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException;
 
 	/**
+	 * Builds an {@link IMapper} that functions in reverse to this one (i.e. one that
+	 * considers as "mapped" what this one considers plain, and vice versa).
+	 * @return the inverted mapper
+	 */
+	IMapper getInverted();
+
+	/**
 	 * Completely resets the mapper, clearing it of all existing mappings.
 	 */
 	void reset();
 
 	/**
-	 * Gets the obfuscated name of the class.
+	 * Gets the {@link ClassData}
 	 * @param name the plain internal name of the desired class
 	 * @return the obfuscated name of the class
 	 * @throws MappingNotFoundException if no mapping is found
 	 */
-	String obfuscateClass(String name) throws MappingNotFoundException;
-
-	/**
-	 * Gets the plain name of the class.
-	 * @param nameObf the obfuscated internal name of the desired class
-	 * @return the plain name of the class
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
-	String deobfuscateClass(String nameObf) throws MappingNotFoundException;
+	ClassData getClassData(String name) throws MappingNotFoundException;
 
 	/**
 	 * Gets the obfuscated name of a class member (field or method).
-	 * @param parentName the plain internal name of the parent class
-	 * @param memberName the field name or method signature
-	 * @param methodDescriptor the descriptor of the member (only for methods)
+	 * @param parent the plain internal name of the parent class
+	 * @param name the field name
+	 * @param descriptor the descriptor of the member (only for methods)
 	 * @return the obfuscated name of the given member
 	 * @throws MappingNotFoundException if no mapping is found
 	 */
-	String obfuscateMember(String parentName, String memberName, String methodDescriptor) throws MappingNotFoundException;
+	MethodData getMethodData(String parent, String name, String descriptor) throws MappingNotFoundException;
 
 	/**
-	 * Gets the plain name of a class member (field or method).
-	 * @param parentName the obfuscated internal name of the parent class
-	 * @param memberName the obfuscated field name or method signature
-	 * @param methodDescriptor the obfuscated descriptor of the member (only for methods)
-	 * @return the plain name of the given member
+	 * Gets the obfuscated name of a class member (field or method).
+	 * @param parent the plain internal name of the parent class
+	 * @param name the field name
+	 * @return the obfuscated name of the given member
 	 * @throws MappingNotFoundException if no mapping is found
 	 */
-	String deobfuscateMember(String parentName, String memberName, String methodDescriptor) throws MappingNotFoundException;
-
+	FieldData getFieldData(String parent, String name) throws MappingNotFoundException;
 }

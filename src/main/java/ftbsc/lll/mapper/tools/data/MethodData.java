@@ -18,7 +18,7 @@ public class MethodData {
 	/**
 	 * The mapped name of the method.
 	 */
-	final String nameMapped;
+	public final String nameMapped;
 
 	/**
 	 * Constructs a new {@link MethodData}.

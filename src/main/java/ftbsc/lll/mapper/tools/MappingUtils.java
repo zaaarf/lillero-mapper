@@ -15,7 +15,7 @@ public class MappingUtils {
 	 * Maps a method descriptor, replacing its class references with their mapped counterparts.
 	 * @param descriptor a {@link String} containing the descriptor
 	 * @param mapper the {@link IMapper} to use for the process
-	 * @param reverse whether it should deobfuscate rather than obfuscate
+	 * @param reverse if true it uses the inverted mapper rather than the normal one
 	 * @return the mapped descriptor
 	 */
 	public static String mapMethodDescriptor(String descriptor, IMapper mapper, boolean reverse) {
@@ -34,8 +34,8 @@ public class MappingUtils {
 	 * Given a {@link Type} and a valid {@link IMapper} it returns its mapped counterpart.
 	 * @param type the type in question
 	 * @param mapper the {@link IMapper} to use for the process
-	 * @param reverse whether it should deobfuscate rather than obfuscate
-	 * @return the obfuscated type
+	 * @param reverse if true it uses the inverted mapper rather than the normal one
+	 * @return the mapped type
 	 */
 	public static Type mapType(Type type, IMapper mapper, boolean reverse) {
 		//unwrap arrays
@@ -55,8 +55,8 @@ public class MappingUtils {
 		String internalNameMapped;
 		try {
 			internalNameMapped = reverse
-				? mapper.deobfuscateClass(internalName)
-				: mapper.obfuscateClass(internalName);
+				? mapper.getInverted().getClassData(internalName).nameMapped
+				: mapper.getClassData(internalName).nameMapped;
 			return Type.getType(DescriptorBuilder.nameToDescriptor(internalNameMapped, arrayLevel));
 		} catch(MappingNotFoundException e) {
 			return type;

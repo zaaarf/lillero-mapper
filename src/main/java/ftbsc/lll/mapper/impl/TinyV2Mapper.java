@@ -15,26 +15,14 @@ import java.util.regex.Pattern;
 @AutoService(IMapper.class)
 public class TinyV2Mapper extends AbstractMapper {
 
-	/**
-	 * Checks whether this mapper can process the given lines.
-	 * @param lines the lines to read
-	 * @return whether this type of mapper can process these lines
-	 */
 	@Override
 	public boolean claim(List<String> lines) {
 		return Pattern.compile("tiny\t2\t[0-9]\t[a-zA-Z]*\t[a-zA-Z]*")
 			.matcher(lines.get(0)).matches();
 	}
 
-	/**
-	 * Reads the given lines of text and attempts to interpret them as
-	 * mappings of the given type.
-	 * @param lines the lines to read
-	 * @param ignoreErrors try to ignore errors and keep going
-	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
-	 */
 	@Override
-	protected void processLines(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+	public void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
 		String currentClass = "";
 		for(int i = 1; i < lines.size(); i++) {
 			String currentLine = lines.get(i);
@@ -75,5 +63,10 @@ public class TinyV2Mapper extends AbstractMapper {
 			if(!ignoreErrors)
 				throw new MalformedMappingsException(i, "wrong number of space-separated tokens");
 		}
+	}
+
+	@Override
+	protected AbstractMapper newInstance() {
+		return new TinyV2Mapper();
 	}
 }

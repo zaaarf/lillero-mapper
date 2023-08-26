@@ -6,18 +6,24 @@ import ftbsc.lll.mapper.AbstractMapper;
 import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.mapper.tools.data.ClassData;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link IMapper} capable of parsing SRG mappings.
  */
 @AutoService(IMapper.class)
 public class SRGMapper extends AbstractMapper {
+
 	/**
-	 * Checks whether this mapper can process the given lines.
-	 * @param lines the lines to read
-	 * @return whether this type of mapper can process these lines
+	 * A {@link Map} tying each obfuscated name to its class data.
+	 * Done this way because SRG files provide mapped descriptors in advance,
+	 * so we can populate this right a way in a less expensive way.
 	 */
+	private final Map<String, ClassData> mappingsInverted = new HashMap<>();
+
+
 	@Override
 	public boolean claim(List<String> lines) {
 		String[] firstLineTokens = lines.get(0).trim().split(" ");
@@ -27,13 +33,6 @@ public class SRGMapper extends AbstractMapper {
 				|| firstLineTokens[0].equals("FD:"));
 	}
 
-	/**
-	 * Populates the {@link IMapper} given the lines, ignoring errors depending on the
-	 * given ignoreErrors flag.
-	 * @param lines the lines to read
-	 * @param ignoreErrors try to ignore errors and keep going
-	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
-	 */
 	@Override
 	public void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
 		for(int i = 0; i < lines.size(); i++) {
@@ -85,14 +84,6 @@ public class SRGMapper extends AbstractMapper {
 	}
 
 	/**
-	 * This does nothing as it is never called for this type of mapper.
-	 * @param lines the lines to read
-	 * @param ignoreErrors try to ignore errors and keep going
-	 */
-	@Override
-	protected void processLines(List<String> lines, boolean ignoreErrors) {}
-
-	/**
 	 * Registers a class in the mapper, if it isn't already.
 	 * @param name the name
 	 * @param nameMapped the mapped name
@@ -127,5 +118,18 @@ public class SRGMapper extends AbstractMapper {
 			data.addMethod(name, nameMapped, descriptor);
 			dataReverse.addMethod(nameMapped, name, descriptorMapped);
 		}
+	}
+
+	@Override
+	public IMapper getInverted() {
+		SRGMapper inverted = new SRGMapper();
+		inverted.mappings.putAll(this.mappingsInverted);
+		inverted.mappingsInverted.putAll(this.mappings); //in case some weirdo calls getInverted() twice
+		return inverted;
+	}
+
+	@Override
+	protected AbstractMapper newInstance() { //not really used but whatever
+		return new SRGMapper();
 	}
 }

@@ -16,25 +16,13 @@ import java.util.List;
 @AutoService(IMapper.class)
 public class TSRGMapper extends AbstractMapper {
 
-	/**
-	 * Checks whether this mapper can process the given lines.
-	 * @param lines the lines to read
-	 * @return whether this type of mapper can process these lines
-	 */
 	@Override
 	public boolean claim(List<String> lines) {
 		return lines.get(0).startsWith("tsrg2 left right");
 	}
 
-	/**
-	 * Reads the given lines of text and attempts to interpret them as
-	 * mappings of the given type.
-	 * @param lines the lines to read
-	 * @param ignoreErrors try to ignore errors and keep going
-	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
-	 */
 	@Override
-	protected void processLines(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+	public void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
 		String currentClass = "";
 		for(int i = 1; i < lines.size(); i++) { //start from 1 to skip header
 			String currentLine = lines.get(i);
@@ -54,5 +42,10 @@ public class TSRGMapper extends AbstractMapper {
 				} else if(!ignoreErrors) throw new MalformedMappingsException(i, "wrong number of space-separated tokens");
 			}
 		}
+	}
+
+	@Override
+	protected AbstractMapper newInstance() {
+		return new TSRGMapper();
 	}
 }

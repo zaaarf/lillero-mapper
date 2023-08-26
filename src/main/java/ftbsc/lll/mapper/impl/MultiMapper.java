@@ -6,8 +6,12 @@ import ftbsc.lll.exceptions.MappingNotFoundException;
 import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.mapper.MapperProvider;
 import ftbsc.lll.mapper.tools.MappingUtils;
+import ftbsc.lll.mapper.tools.data.ClassData;
+import ftbsc.lll.mapper.tools.data.FieldData;
+import ftbsc.lll.mapper.tools.data.MethodData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,23 +26,11 @@ public class MultiMapper implements IMapper {
 	 */
 	private final List<IMapper> mapperList = new ArrayList<>();
 
-	/**
-	 * Checks whether this mapper can process the given lines.
-	 * @param lines the lines to read
-	 * @return whether this type of mapper can process these lines
-	 */
 	@Override
 	public boolean claim(List<String> lines) {
 		return lines.get(0).equals("lll multimapper");
 	}
 
-	/**
-	 * Populates the {@link IMapper} given the lines, ignoring errors depending on the
-	 * given ignoreErrors flag.
-	 * @param lines the lines to read
-	 * @param ignoreErrors try to ignore errors and keep going
-	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
-	 */
 	@Override
 	public void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
 		for(int i = 1; i < lines.size(); i++) {
@@ -49,75 +41,44 @@ public class MultiMapper implements IMapper {
 		}
 	}
 
-	/**
-	 * Completely resets the mapper, clearing it of all existing mappings.
-	 */
+	@Override
+	public IMapper getInverted() {
+		MultiMapper reverse = new MultiMapper();
+		this.mapperList.forEach(m -> reverse.mapperList.add(m.getInverted()));
+		Collections.reverse(reverse.mapperList);
+		return reverse;
+	}
+
 	@Override
 	public void reset() {
 		this.mapperList.forEach(IMapper::reset);
 		this.mapperList.clear();
 	}
 
-	/**
-	 * Gets the obfuscated name of the class.
-	 * @param name the plain internal name of the desired class
-	 * @return the obfuscated name of the class
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
 	@Override
-	public String obfuscateClass(String name) throws MappingNotFoundException {
-		for(IMapper mapper : this.mapperList)
-			name = mapper.obfuscateClass(name);
-		return name;
+	public ClassData getClassData(String name) throws MappingNotFoundException {
+		ClassData classData = this.mapperList.get(0).getClassData(name);
+		for(int i = 1; i < this.mapperList.size(); i++)
+			classData = this.mapperList.get(i).getClassData(classData.nameMapped);
+		return classData;
 	}
 
-	/**
-	 * Gets the plain name of the class.
-	 * @param nameObf the obfuscated internal name of the desired class
-	 * @return the plain name of the class
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
 	@Override
-	public String deobfuscateClass(String nameObf) throws MappingNotFoundException {
-		for(int i = this.mapperList.size() - 1; i >= 0; i--)
-			nameObf = this.mapperList.get(i).deobfuscateClass(nameObf);
-		return nameObf;
-	}
-
-	/**
-	 * Gets the obfuscated name of a class member (field or method).
-	 * @param parentName the plain internal name of the parent class
-	 * @param memberName the field name or method signature
-	 * @param methodDescriptor the descriptor of the member (only for methods)
-	 * @return the obfuscated name of the given member
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
-	@Override
-	public String obfuscateMember(String parentName, String memberName, String methodDescriptor) throws MappingNotFoundException {
-		for(IMapper mapper : this.mapperList) {
-			memberName = mapper.obfuscateMember(parentName, memberName, methodDescriptor);
-			methodDescriptor = MappingUtils.mapMethodDescriptor(methodDescriptor, mapper, false);
-			parentName = mapper.obfuscateClass(parentName);
-		}
-		return memberName;
-	}
-
-	/**
-	 * Gets the plain name of a class member (field or method).
-	 * @param parentName the obfuscated internal name of the parent class
-	 * @param memberName the obfuscated field name or method signature
-	 * @param methodDescriptor the obfuscated descriptor of the member (only for methods)
-	 * @return the plain name of the given member
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
-	@Override
-	public String deobfuscateMember(String parentName, String memberName, String methodDescriptor) throws MappingNotFoundException {
-		for(int i = this.mapperList.size() - 1; i >= 0; i--) {
+	public MethodData getMethodData(String parent, String name, String descriptor) throws MappingNotFoundException {
+		MethodData methodData = this.mapperList.get(0).getMethodData(parent, name, descriptor);
+		for(int i = 1; i < this.mapperList.size(); i++) {
 			IMapper mapper = this.mapperList.get(i);
-			memberName = mapper.deobfuscateMember(parentName, memberName, methodDescriptor);
-			methodDescriptor = MappingUtils.mapMethodDescriptor(methodDescriptor, mapper, true);
-			parentName = mapper.deobfuscateClass(parentName);
+			methodData = mapper.getMethodData(methodData.parentClass.nameMapped, methodData.nameMapped,
+				MappingUtils.mapMethodDescriptor(methodData.signature.descriptor, mapper, false));
 		}
-		return memberName;
+		return methodData;
+	}
+
+	@Override
+	public FieldData getFieldData(String parent, String name) throws MappingNotFoundException {
+		FieldData fieldData = this.mapperList.get(0).getFieldData(parent, name);
+		for(int i = 1; i < this.mapperList.size(); i++)
+			fieldData = this.mapperList.get(i).getFieldData(fieldData.parentClass.nameMapped, fieldData.nameMapped);
+		return fieldData;
 	}
 }

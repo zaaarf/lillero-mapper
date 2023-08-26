@@ -3,7 +3,7 @@ package ftbsc.lll.exceptions;
 /**
  * Thrown when something goes wrong while parsing a mappings file.
  */
-public class MalformedMappingsException extends Exception {
+public class MalformedMappingsException extends RuntimeException {
 
 	/**
 	 * Constructs a new {@link MalformedMappingsException} given the line number

@@ -73,6 +73,7 @@ public class ClassData {
 	 * Should always be called only after the given mapper has finished
 	 * processing all classes.
 	 * @param mapper the mapper that generated this data
+	 * @return a ClassData representing the inverted mappings
 	 */
 	public ClassData generateReverseMappings(IMapper mapper) {
 		ClassData reverse = new ClassData(this.nameMapped, this.name);

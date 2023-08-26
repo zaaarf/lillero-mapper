@@ -6,7 +6,6 @@ import ftbsc.lll.mapper.AbstractMapper;
 import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.mapper.tools.data.ClassData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,24 +35,23 @@ public class TSRGMapper extends AbstractMapper {
 	 */
 	@Override
 	protected void processLines(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
-		//skip the first line ("tsrg2 left right")
-		lines = new ArrayList<>(lines);
-		lines.remove(0);
-
 		String currentClass = "";
-		for(String l : lines) {
-			if(l == null) continue;
-			if(l.startsWith("\t") || l.startsWith(" ")) {
-				String[] split = l.trim().split(" ");
-				if(split.length == 2) //field
-					this.mappings.get(currentClass).addField(split[0], split[1]);
-				else if (split.length == 3)//method
-					this.mappings.get(currentClass).addMethod(split[0], split[2], split[1]); //add child
+		for(int i = 1; i < lines.size(); i++) { //start from 1 to skip header
+			String currentLine = lines.get(i);
+			boolean isMember = currentLine.startsWith("\t") || currentLine.startsWith(" ");
+			String[] tokens = currentLine.trim().split(" ");
+			if(isMember) {
+				if(tokens.length == 2) //field
+					this.mappings.get(currentClass).addField(tokens[0], tokens[1]);
+				else if(tokens.length == 3)//method
+					this.mappings.get(currentClass).addMethod(tokens[0], tokens[2], tokens[1]); //add child
+				else if(!ignoreErrors) throw new MalformedMappingsException(i, "wrong number of space-separated tokens");
 			} else {
-				String[] sp = l.split(" ");
-				ClassData s = new ClassData(sp[0], sp[1]);
-				currentClass = s.name;
-				this.mappings.put(s.name, s);
+				if(tokens.length == 2) {
+					ClassData s = new ClassData(tokens[0], tokens[1]);
+					currentClass = s.name;
+					this.mappings.put(s.name, s);
+				} else if(!ignoreErrors) throw new MalformedMappingsException(i, "wrong number of space-separated tokens");
 			}
 		}
 	}

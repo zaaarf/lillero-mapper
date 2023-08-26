@@ -1,7 +1,17 @@
 package ftbsc.lll.exceptions;
 
+/**
+ * Thrown when something goes wrong while parsing a mappings file.
+ */
 public class MalformedMappingsException extends Exception {
-	public MalformedMappingsException(String mapping, String type) {
-		super(String.format("Unexpected token at line %s for mapper type %s!", mapping, type));
+
+	/**
+	 * Constructs a new {@link MalformedMappingsException} given the line number
+	 * and an error message.
+	 * @param lineNumber the line the error occurred at
+	 * @param error the error message
+	 */
+	public MalformedMappingsException(int lineNumber, String error) {
+		super(String.format("Unexpected token at line %d: %s!", lineNumber, error));
 	}
 }

@@ -1,75 +1,60 @@
 package ftbsc.lll.mapper.impl;
 
 import com.google.auto.service.AutoService;
-import ftbsc.lll.exceptions.MappingNotFoundException;
+import ftbsc.lll.exceptions.MalformedMappingsException;
+import ftbsc.lll.mapper.AbstractMapper;
 import ftbsc.lll.mapper.IMapper;
-import ftbsc.lll.mapper.tools.ClassData;
+import ftbsc.lll.mapper.tools.data.ClassData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Parses a .tsrg file into a mapper capable of converting from
- * plain names to obfuscated ones and vice versa.
+ * A {@link IMapper} capable of parsing TSRG (an intermediary
+ * format used by Forge) files.
  */
 
 @AutoService(IMapper.class)
-public class TSRGMapper implements IMapper {
+public class TSRGMapper extends AbstractMapper {
 
 	/**
-	 * A Map containing the deobfuscated names as keys and information about
-	 * each class as values.
+	 * Checks whether this mapper can process the given lines.
+	 * @param lines the lines to read
+	 * @return whether this type of mapper can process these lines
 	 */
-	private final Map<String, ClassData> mappings = new HashMap<>();
+	@Override
+	public boolean claim(List<String> lines) {
+		return lines.get(0).startsWith("tsrg2 left right");
+	}
 
 	/**
 	 * Reads the given lines of text and attempts to interpret them as
 	 * mappings of the given type.
 	 * @param lines the lines to read
+	 * @param ignoreErrors try to ignore errors and keep going
+	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
 	 */
 	@Override
-	public void populate(Iterable<String> lines) {
+	protected void processLines(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+		//skip the first line ("tsrg2 left right")
+		lines = new ArrayList<>(lines);
+		lines.remove(0);
+
 		String currentClass = "";
 		for(String l : lines) {
 			if(l == null) continue;
-			if(l.startsWith("\t"))
-				mappings.get(currentClass).addMember(l);
-			else {
+			if(l.startsWith("\t") || l.startsWith(" ")) {
+				String[] split = l.trim().split(" ");
+				if(split.length == 2) //field
+					this.mappings.get(currentClass).addField(split[0], split[1]);
+				else if (split.length == 3)//method
+					this.mappings.get(currentClass).addMethod(split[0], split[2], split[1]); //add child
+			} else {
 				String[] sp = l.split(" ");
 				ClassData s = new ClassData(sp[0], sp[1]);
-				currentClass = s.unobf;
-				mappings.put(s.unobf, s);
+				currentClass = s.name;
+				this.mappings.put(s.name, s);
 			}
 		}
-	}
-
-	/**
-	 * Gets the obfuscated name of the class.
-	 * @param name the unobfuscated internal name of the desired class
-	 * @return the obfuscated name of the class
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
-	@Override
-	public String obfuscateClass(String name)  {
-		ClassData data = mappings.get(name.replace('.', '/'));
-		if(data == null)
-			throw new MappingNotFoundException(name);
-		else return data.obf;
-	}
-
-	/**
-	 * Gets the obfuscated name of a class member (field or method).
-	 * @param parentName the unobfuscated internal name of the parent class
-	 * @param memberName the field name or method signature
-	 * @param methodDescriptor the optional descriptor of the member, may be null or partial
-	 * @return the obfuscated name of the given member
-	 * @throws MappingNotFoundException if no mapping is found
-	 */
-	@Override
-	public String obfuscateMember(String parentName, String memberName, String methodDescriptor) {
-		ClassData data = mappings.get(parentName.replace('.', '/'));
-		if(data == null)
-			throw new MappingNotFoundException(parentName + "::" + memberName);
-		return data.get(memberName, methodDescriptor);
 	}
 }

@@ -58,4 +58,9 @@ public abstract class AbstractMapper implements IMapper {
 	public FieldData getFieldData(String parent, String name) throws MappingNotFoundException {
 		return this.getClassData(parent).mapField(name);
 	}
+
+	@Override
+	public Map<String, ClassData> getRawMappings() {
+		return this.mappings;
+	}
 }

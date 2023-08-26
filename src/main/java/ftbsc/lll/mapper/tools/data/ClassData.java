@@ -115,4 +115,20 @@ public class ClassData {
 			throw new MappingNotFoundException("field", String.format("%s.%s", this.name, fieldName));
 		else return data;
 	}
+
+	/**
+	 * Gets the underlying {@link Map} for {@link MethodData}.
+	 * @return a {@link Map} tying each {@link MethodSignature} to its {@link MethodData}
+	 */
+	public Map<MethodSignature, MethodData> getMethods() {
+		return this.methods;
+	}
+
+	/**
+	 * Gets the underlying {@link Map} for {@link FieldData}.
+	 * @return a {@link Map} tying each field name to its {@link FieldData}
+	 */
+	public Map<String, FieldData> getFields() {
+		return this.fields;
+	}
 }

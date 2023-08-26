@@ -77,4 +77,10 @@ public interface IMapper {
 	 * @throws MappingNotFoundException if no mapping is found
 	 */
 	FieldData getFieldData(String parent, String name) throws MappingNotFoundException;
+
+	/**
+	 * Fetches the "raw mappings" from an {@link IMapper}.
+	 * @return a map tying each {@link ClassData} to the class' plain name
+	 */
+	Map<String, ClassData> getRawMappings();
 }

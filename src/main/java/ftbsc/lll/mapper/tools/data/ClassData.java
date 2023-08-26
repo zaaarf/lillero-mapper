@@ -77,7 +77,7 @@ public class ClassData {
 	public ClassData generateReverseMappings(IMapper mapper) {
 		ClassData reverse = new ClassData(this.nameMapped, this.name);
 		this.methods.forEach((signature, data) -> reverse.addMethod(nameMapped, signature.name,
-			MappingUtils.obfuscateMethodDescriptor(signature.descriptor, mapper)));
+			MappingUtils.mapMethodDescriptor(signature.descriptor, mapper, false)));
 		this.fields.forEach((name, data) -> reverse.addField(data.nameMapped, name));
 		return reverse;
 	}

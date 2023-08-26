@@ -10,33 +10,34 @@ import org.objectweb.asm.Type;
  * mappers.
  */
 public class MappingUtils {
+
 	/**
-	 * Obfuscates a method descriptor, replacing its class references
-	 * with their obfuscated counterparts.
+	 * Maps a method descriptor, replacing its class references with their mapped counterparts.
 	 * @param descriptor a {@link String} containing the descriptor
 	 * @param mapper the {@link IMapper} to use for the process
-	 * @return the obfuscated descriptor
+	 * @param reverse whether it should deobfuscate rather than obfuscate
+	 * @return the mapped descriptor
 	 */
-	public static String obfuscateMethodDescriptor(String descriptor, IMapper mapper) {
+	public static String mapMethodDescriptor(String descriptor, IMapper mapper, boolean reverse) {
 		Type method = Type.getMethodType(descriptor);
 		Type[] arguments = method.getArgumentTypes();
 		Type returnType = method.getReturnType();
 
-		Type[] obfArguments = new Type[arguments.length];
-		for(int i = 0; i < obfArguments.length; i++)
-			obfArguments[i] = obfuscateType(arguments[i], mapper);
+		Type[] mappedArguents = new Type[arguments.length];
+		for(int i = 0; i < mappedArguents.length; i++)
+			mappedArguents[i] = mapType(arguments[i], mapper, reverse);
 
-		return Type.getMethodDescriptor(obfuscateType(returnType, mapper), obfArguments);
+		return Type.getMethodDescriptor(mapType(returnType, mapper, reverse), mappedArguents);
 	}
 
 	/**
-	 * Given a {@link Type} and a valid {@link IMapper} it returns its obfuscated
-	 * counterpart.
+	 * Given a {@link Type} and a valid {@link IMapper} it returns its mapped counterpart.
 	 * @param type the type in question
 	 * @param mapper the {@link IMapper} to use for the process
+	 * @param reverse whether it should deobfuscate rather than obfuscate
 	 * @return the obfuscated type
 	 */
-	public static Type obfuscateType(Type type, IMapper mapper) {
+	public static Type mapType(Type type, IMapper mapper, boolean reverse) {
 		//unwrap arrays
 		Type unwrapped = type;
 		int arrayLevel = 0;
@@ -51,10 +52,12 @@ public class MappingUtils {
 
 		String internalName = type.getInternalName();
 
-		String internalNameObf;
+		String internalNameMapped;
 		try {
-			internalNameObf = mapper.obfuscateClass(internalName);
-			return Type.getType(DescriptorBuilder.nameToDescriptor(internalNameObf, arrayLevel));
+			internalNameMapped = reverse
+				? mapper.deobfuscateClass(internalName)
+				: mapper.obfuscateClass(internalName);
+			return Type.getType(DescriptorBuilder.nameToDescriptor(internalNameMapped, arrayLevel));
 		} catch(MappingNotFoundException e) {
 			return type;
 		}

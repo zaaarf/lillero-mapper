@@ -8,24 +8,37 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The main class of the mapper library. It loads all the
  * valid {@link IMapper}s and gets information from them.
  */
 public class MapperProvider {
+	/**
+	 * The static instance of the provider.
+	 */
 	private static MapperProvider INSTANCE = null;
 
+	/**
+	 * @return the static instance of the provider
+	 */
 	private static MapperProvider getInstance() {
 		return INSTANCE == null ? (INSTANCE = new MapperProvider()) : INSTANCE;
 	}
 
-	private Set<IMapper> loadedMappers = null;
+	/**
+	 * A {@link Set} containing all the loaded mapper classes.
+	 */
+	private Set<Class<? extends IMapper>> loadedMappers = null;
 
+	/**
+	 * Loads the mapper classes into a {@link Set}.
+	 */
 	private void loadMappers() {
 		this.loadedMappers = new HashSet<>();
 		for(IMapper mapper: ServiceLoader.load(IMapper.class))
-			this.loadedMappers.add(mapper);
+			this.loadedMappers.add(mapper.getClass());
 		if(this.loadedMappers.isEmpty())
 			throw new RuntimeException("Something went wrong: no mapper types were loaded successfully!");
 	}
@@ -41,7 +54,12 @@ public class MapperProvider {
 		if(getInstance().loadedMappers == null)
 			getInstance().loadMappers();
 		return getInstance().loadedMappers.stream()
-			.filter(m -> m.claim(data))
+			.flatMap(clazz -> {
+				try {
+					return Stream.of(clazz.newInstance());
+				} catch(ReflectiveOperationException ignored) {}
+				return Stream.empty();
+			}).filter(m -> m.claim(data))
 			.max(Comparator.comparingInt(IMapper::priority))
 			.orElseThrow(InvalidResourceException::new);
 	}

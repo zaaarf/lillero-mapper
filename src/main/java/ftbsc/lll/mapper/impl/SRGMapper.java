@@ -9,7 +9,7 @@ import ftbsc.lll.mapper.tools.data.ClassData;
 import java.util.List;
 
 /**
- * A {@link IMapper} capable of parsing SRG files.
+ * A {@link IMapper} capable of parsing SRG mappings.
  */
 @AutoService(IMapper.class)
 public class SRGMapper extends AbstractMapper {

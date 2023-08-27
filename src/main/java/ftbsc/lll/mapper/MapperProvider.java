@@ -75,7 +75,7 @@ public class MapperProvider {
 		try {
 			URI target = new URI(location);
 			targetStream = target.toURL().openStream();
-		} catch(URISyntaxException | IOException e) {
+		} catch(URISyntaxException | IllegalArgumentException | IOException e) {
 			//may be a local file path
 			File f = new File(location);
 			try {

@@ -69,6 +69,16 @@ public class ClassData {
 	}
 
 	/**
+	 * Adds a field to the target class.
+	 * @param plain the name of the field
+	 * @param mapped the mapped name of the field
+	 * @param descriptor the plain type descriptor of the field
+	 */
+	public void addField(String plain, String mapped, String descriptor) {
+		this.fields.put(plain, new FieldData(this, plain, mapped, descriptor));
+	}
+
+	/**
 	 * Generates the reverse mappings for this class.
 	 * Should always be called only after the given mapper has finished
 	 * processing all classes.

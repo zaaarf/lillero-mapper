@@ -53,7 +53,7 @@ public class TinyV2Mapper extends AbstractMapper {
 						case 'f': //fields
 							if(tokens.length == 4)
 								break;
-							this.mappings.get(currentClass).addField(tokens[2], tokens[3]);
+							this.mappings.get(currentClass).addField(tokens[2], tokens[3], tokens[1]);
 							continue;
 					}
 					break;

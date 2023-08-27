@@ -21,7 +21,14 @@ public class FieldData {
 	public final String nameMapped;
 
 	/**
-	 * Constructs a new {@link FieldData}.
+	 * The field's type descriptor.
+	 * Some formats may not specify it; if this was created in one such format,
+	 * this is going to be null.
+	 */
+	public final String descriptor;
+
+	/**
+	 * Constructs a new {@link FieldData} with unspecified descriptor.
 	 * @param parentClass the {@link ClassData} representation of the parent class
 	 * @param name the field name
 	 * @param nameMapped the mapped field name
@@ -30,5 +37,20 @@ public class FieldData {
 		this.parentClass = parentClass;
 		this.name = name;
 		this.nameMapped = nameMapped;
+		this.descriptor = null;
+	}
+
+	/**
+	 * Constructs a new {@link FieldData} with descriptor.
+	 * @param parentClass the {@link ClassData} representation of the parent class
+	 * @param name the field name
+	 * @param nameMapped the mapped field name
+	 * @param descriptor the field's type descriptor
+	 */
+	public FieldData(ClassData parentClass, String name, String nameMapped, String descriptor) {
+		this.parentClass = parentClass;
+		this.name = name;
+		this.nameMapped = nameMapped;
+		this.descriptor = descriptor;
 	}
 }

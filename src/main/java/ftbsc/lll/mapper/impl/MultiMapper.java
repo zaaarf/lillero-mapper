@@ -51,7 +51,7 @@ public class MultiMapper extends AbstractMapper {
 			data.getFields().forEach((fieldName, fieldData) -> {
 				for(int i = 1; i < mapperList.size(); i++)
 					fieldData = mapperList.get(i).getFieldData(fieldData.parentClass.nameMapped, fieldData.nameMapped);
-				sumData.addField(fieldName, fieldData.nameMapped);
+				sumData.addField(fieldName, fieldData.nameMapped, fieldData.descriptor);
 			});
 
 			this.mappings.put(sumData.name, sumData);

@@ -7,6 +7,7 @@ import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.mapper.tools.data.ClassData;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * A {@link IMapper} capable of parsing TSRG (an intermediary
@@ -18,7 +19,8 @@ public class TSRGMapper extends AbstractMapper {
 
 	@Override
 	public boolean claim(List<String> lines) {
-		return lines.get(0).startsWith("tsrg2 left right");
+		return Pattern.compile("tsrg2 [a-zA-Z]* [a-zA-Z]*")
+			.matcher(lines.get(0)).matches();
 	}
 
 	@Override

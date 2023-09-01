@@ -1,9 +1,9 @@
 package ftbsc.lll.exceptions;
 
-import ftbsc.lll.mapper.IMapper;
+import ftbsc.lll.mapper.IMappingFormat;
 
 /**
- * Thrown upon failure to find the requested mapping within a loaded {@link IMapper}.
+ * Thrown upon failure to find the requested mapping within a loaded {@link IMappingFormat}.
  */
 public class MappingNotFoundException extends RuntimeException {
 

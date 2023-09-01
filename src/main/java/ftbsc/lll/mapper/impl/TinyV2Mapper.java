@@ -2,18 +2,18 @@ package ftbsc.lll.mapper.impl;
 
 import com.google.auto.service.AutoService;
 import ftbsc.lll.exceptions.MalformedMappingsException;
-import ftbsc.lll.mapper.AbstractMapper;
-import ftbsc.lll.mapper.IMapper;
+import ftbsc.lll.mapper.IMappingFormat;
+import ftbsc.lll.mapper.tools.Mapper;
 import ftbsc.lll.mapper.tools.data.ClassData;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * A {@link IMapper} capable of parsing TinyV2 mappings
+ * A {@link IMappingFormat} capable of parsing TinyV2 mappings.
  */
-@AutoService(IMapper.class)
-public class TinyV2Mapper extends AbstractMapper {
+@AutoService(IMappingFormat.class)
+public class TinyV2Mapper implements IMappingFormat {
 
 	@Override
 	public boolean claim(List<String> lines) {
@@ -22,7 +22,8 @@ public class TinyV2Mapper extends AbstractMapper {
 	}
 
 	@Override
-	public void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+	public Mapper getMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+		Mapper result = new Mapper();
 		String currentClass = "";
 		for(int i = 1; i < lines.size(); i++) {
 			String currentLine = lines.get(i);
@@ -32,7 +33,7 @@ public class TinyV2Mapper extends AbstractMapper {
 				case 0: //classes
 					if(tokens.length == 3) {
 						if(tokens[0].charAt(0) == 'c') {
-							this.mappings.put(tokens[1], new ClassData(tokens[1], tokens[2]));
+							result.getRawMappings().put(tokens[1], new ClassData(tokens[1], tokens[2]));
 							currentClass = tokens[1];
 						} else if(!ignoreErrors)
 							throw new MalformedMappingsException(i, "root-level element must be class");
@@ -48,12 +49,12 @@ public class TinyV2Mapper extends AbstractMapper {
 						case 'm': //methods
 							if(tokens.length == 4)
 								break;
-							this.mappings.get(currentClass).addMethod(tokens[2], tokens[3], tokens[1]);
+							result.getClassData(currentClass).addMethod(tokens[2], tokens[3], tokens[1]);
 							continue;
 						case 'f': //fields
 							if(tokens.length == 4)
 								break;
-							this.mappings.get(currentClass).addField(tokens[2], tokens[3], tokens[1]);
+							result.getClassData(currentClass).addField(tokens[2], tokens[3], tokens[1]);
 							continue;
 					}
 					break;
@@ -61,12 +62,8 @@ public class TinyV2Mapper extends AbstractMapper {
 					break;
 			}
 			if(!ignoreErrors)
-				throw new MalformedMappingsException(i, "wrong number of space-separated tokens");
+				throw new MalformedMappingsException(i, "wrong number of tab-separated tokens");
 		}
-	}
-
-	@Override
-	protected AbstractMapper newInstance() {
-		return new TinyV2Mapper();
+		return result;
 	}
 }

@@ -1,7 +1,7 @@
 package ftbsc.lll.mapper.tools.data;
 
 import ftbsc.lll.exceptions.MappingNotFoundException;
-import ftbsc.lll.mapper.IMapper;
+import ftbsc.lll.mapper.tools.Mapper;
 import ftbsc.lll.mapper.tools.MappingUtils;
 
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public class ClassData {
 	 * @param mapper the mapper that generated this data
 	 * @return a ClassData representing the inverted mappings
 	 */
-	public ClassData generateReverseMappings(IMapper mapper) {
+	public ClassData generateReverseMappings(Mapper mapper) {
 		ClassData reverse = new ClassData(this.nameMapped, this.name);
 		this.methods.forEach((signature, data) -> reverse.addMethod(nameMapped, signature.name,
 			MappingUtils.mapMethodDescriptor(signature.descriptor, mapper, false)));

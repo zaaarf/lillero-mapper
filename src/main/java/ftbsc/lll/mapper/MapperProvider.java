@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 /**
  * The main class of the mapper library. It loads all the
- * valid {@link IMapper}s and gets information from them.
+ * valid {@link IMappingFormat}s and gets information from them.
  */
 public class MapperProvider {
 	/**
@@ -30,14 +30,14 @@ public class MapperProvider {
 	/**
 	 * A {@link Set} containing all the loaded mapper classes.
 	 */
-	private Set<Class<? extends IMapper>> loadedMappers = null;
+	private Set<Class<? extends IMappingFormat>> loadedMappers = null;
 
 	/**
 	 * Loads the mapper classes into a {@link Set}.
 	 */
 	private void loadMappers() {
 		this.loadedMappers = new HashSet<>();
-		for(IMapper mapper: ServiceLoader.load(IMapper.class))
+		for(IMappingFormat mapper: ServiceLoader.load(IMappingFormat.class))
 			this.loadedMappers.add(mapper.getClass());
 		if(this.loadedMappers.isEmpty())
 			throw new RuntimeException("Something went wrong: no mapper types were loaded successfully!");
@@ -48,9 +48,9 @@ public class MapperProvider {
 	 * attempts to load the resource at given location and to populate a mapper with
 	 * its data.
 	 * @param data the file as a list of strings
-	 * @return a {@link IMapper} (populating it is left to the user)
+	 * @return a {@link IMappingFormat} (populating it is left to the user)
 	 */
-	public static IMapper getMapper(List<String> data) {
+	public static IMappingFormat getMapper(List<String> data) {
 		if(getInstance().loadedMappers == null)
 			getInstance().loadMappers();
 		return getInstance().loadedMappers.stream()
@@ -60,7 +60,7 @@ public class MapperProvider {
 				} catch(ReflectiveOperationException ignored) {}
 				return Stream.empty();
 			}).filter(m -> m.claim(data))
-			.max(Comparator.comparingInt(IMapper::priority))
+			.max(Comparator.comparingInt(IMappingFormat::priority))
 			.orElseThrow(InvalidResourceException::new);
 	}
 

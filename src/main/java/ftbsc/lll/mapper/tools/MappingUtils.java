@@ -1,7 +1,6 @@
 package ftbsc.lll.mapper.tools;
 
 import ftbsc.lll.exceptions.MappingNotFoundException;
-import ftbsc.lll.mapper.IMapper;
 import ftbsc.lll.tools.DescriptorBuilder;
 import org.objectweb.asm.Type;
 
@@ -14,11 +13,11 @@ public class MappingUtils {
 	/**
 	 * Maps a method descriptor, replacing its class references with their mapped counterparts.
 	 * @param descriptor a {@link String} containing the descriptor
-	 * @param mapper the {@link IMapper} to use for the process
+	 * @param mapper the {@link Mapper} to use for the process
 	 * @param reverse if true it uses the inverted mapper rather than the normal one
 	 * @return the mapped descriptor
 	 */
-	public static String mapMethodDescriptor(String descriptor, IMapper mapper, boolean reverse) {
+	public static String mapMethodDescriptor(String descriptor, Mapper mapper, boolean reverse) {
 		Type method = Type.getMethodType(descriptor);
 		Type[] arguments = method.getArgumentTypes();
 		Type returnType = method.getReturnType();
@@ -31,13 +30,13 @@ public class MappingUtils {
 	}
 
 	/**
-	 * Given a {@link Type} and a valid {@link IMapper} it returns its mapped counterpart.
+	 * Given a {@link Type} and a valid {@link Mapper} it returns its mapped counterpart.
 	 * @param type the type in question
-	 * @param mapper the {@link IMapper} to use for the process
+	 * @param mapper the {@link Mapper} to use for the process
 	 * @param reverse if true it uses the inverted mapper rather than the normal one
 	 * @return the mapped type
 	 */
-	public static Type mapType(Type type, IMapper mapper, boolean reverse) {
+	public static Type mapType(Type type, Mapper mapper, boolean reverse) {
 		//unwrap arrays
 		Type unwrapped = type;
 		int arrayLevel = 0;

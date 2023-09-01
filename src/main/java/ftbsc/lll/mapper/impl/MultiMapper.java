@@ -2,9 +2,9 @@ package ftbsc.lll.mapper.impl;
 
 import com.google.auto.service.AutoService;
 import ftbsc.lll.exceptions.MalformedMappingsException;
-import ftbsc.lll.mapper.AbstractMapper;
-import ftbsc.lll.mapper.IMapper;
+import ftbsc.lll.mapper.IMappingFormat;
 import ftbsc.lll.mapper.MapperProvider;
+import ftbsc.lll.mapper.tools.Mapper;
 import ftbsc.lll.mapper.tools.MappingUtils;
 import ftbsc.lll.mapper.tools.data.ClassData;
 
@@ -15,21 +15,22 @@ import java.util.List;
  * Special mapper type that actually resolves to an ordered
  * sequence of mappers applied one after the other.
  */
-@AutoService(IMapper.class)
-public class MultiMapper extends AbstractMapper {
+@AutoService(IMappingFormat.class)
+public class MultiMapper implements IMappingFormat {
 	@Override
 	public boolean claim(List<String> lines) {
 		return lines.get(0).equals("lll multimapper");
 	}
 
 	@Override
-	public void populate(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
-		List<IMapper> mapperList = new ArrayList<>();
+	public Mapper getMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+		Mapper result = new Mapper();
+		List<Mapper> mapperList = new ArrayList<>();
+
 		for(int i = 1; i < lines.size(); i++) {
 			List<String> data = MapperProvider.fetchFromLocalOrRemote(lines.get(i));
-			IMapper mapper = MapperProvider.getMapper(data);
-			mapper.populate(data, ignoreErrors);
-			mapperList.add(mapper);
+			IMappingFormat format = MapperProvider.getMapper(data);
+			mapperList.add(format.getMapper(data, ignoreErrors));
 		}
 
 		mapperList.get(0).getRawMappings().forEach((name, data) -> {
@@ -41,7 +42,7 @@ public class MultiMapper extends AbstractMapper {
 
 			data.getMethods().forEach((signature, methodData) -> {
 				for(int i = 1; i < mapperList.size(); i++) {
-					IMapper mapper = mapperList.get(i);
+					Mapper mapper = mapperList.get(i);
 					methodData = mapper.getMethodData(methodData.parentClass.nameMapped, methodData.nameMapped,
 						MappingUtils.mapMethodDescriptor(methodData.signature.descriptor, mapper, false));
 				}
@@ -54,12 +55,9 @@ public class MultiMapper extends AbstractMapper {
 				sumData.addField(fieldName, fieldData.nameMapped, fieldData.descriptor);
 			});
 
-			this.mappings.put(sumData.name, sumData);
+			result.getRawMappings().put(sumData.name, sumData);
 		});
-	}
 
-	@Override
-	protected AbstractMapper newInstance() {
-		return new MultiMapper();
+		return result;
 	}
 }

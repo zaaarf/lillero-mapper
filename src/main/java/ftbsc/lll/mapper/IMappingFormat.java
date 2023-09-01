@@ -41,6 +41,7 @@ public interface IMappingFormat {
 	 * returns its inverted form.
 	 * @param lines the lines to read
 	 * @param ignoreErrors try to ignore errors and keep going
+	 * @return the inverted {@link Mapper}
 	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
 	 */
 	default Mapper getInvertedMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {

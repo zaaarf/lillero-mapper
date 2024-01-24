@@ -1,7 +1,7 @@
 package ftbsc.lll.mapper;
 
 import ftbsc.lll.exceptions.MalformedMappingsException;
-import ftbsc.lll.mapper.tools.Mapper;
+import ftbsc.lll.mapper.utils.Mapper;
 
 import java.util.List;
 

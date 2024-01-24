@@ -1,8 +1,8 @@
-package ftbsc.lll.mapper.tools.data;
+package ftbsc.lll.mapper.data;
 
 import ftbsc.lll.exceptions.MappingNotFoundException;
-import ftbsc.lll.mapper.tools.Mapper;
-import ftbsc.lll.mapper.tools.MappingUtils;
+import ftbsc.lll.mapper.utils.Mapper;
+import ftbsc.lll.mapper.utils.MappingUtils;
 
 import java.util.HashMap;
 import java.util.List;

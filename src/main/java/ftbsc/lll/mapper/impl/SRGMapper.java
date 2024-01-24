@@ -3,8 +3,8 @@ package ftbsc.lll.mapper.impl;
 import com.google.auto.service.AutoService;
 import ftbsc.lll.exceptions.MalformedMappingsException;
 import ftbsc.lll.mapper.IMappingFormat;
-import ftbsc.lll.mapper.tools.Mapper;
-import ftbsc.lll.mapper.tools.data.ClassData;
+import ftbsc.lll.mapper.utils.Mapper;
+import ftbsc.lll.mapper.data.ClassData;
 
 import java.util.List;
 

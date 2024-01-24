@@ -1,7 +1,7 @@
-package ftbsc.lll.mapper.tools;
+package ftbsc.lll.mapper.utils;
 
 import ftbsc.lll.exceptions.MappingNotFoundException;
-import ftbsc.lll.tools.DescriptorBuilder;
+import ftbsc.lll.utils.DescriptorBuilder;
 import org.objectweb.asm.Type;
 
 /**

@@ -1,4 +1,4 @@
-package ftbsc.lll.mapper.tools.data;
+package ftbsc.lll.mapper.data;
 
 /**
  * Container class for method data.

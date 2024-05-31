@@ -28,41 +28,46 @@ public class TinyV2Mapper implements IMappingFormat {
 		for(int i = 1; i < lines.size(); i++) {
 			String currentLine = lines.get(i);
 			String[] tokens = currentLine.trim().split("\t");
-			int tabCount = currentLine.indexOf(tokens[0]); //get number of leading tabs
+			int tabCount = currentLine.indexOf(tokens[0]); // get number of leading tabs
 			switch(tabCount) {
-				case 0: //classes
+				case 0: // classes
 					if(tokens.length == 3) {
 						if(tokens[0].charAt(0) == 'c') {
 							result.getRawMappings().put(tokens[1], new ClassData(tokens[1], tokens[2]));
 							currentClass = tokens[1];
 						} else if(!ignoreErrors)
-							throw new MalformedMappingsException(i, "root-level element must be class");
+							throw new MalformedMappingsException(i + 1, "root-level element must be class");
 						continue;
 					}
 					break;
-				case 1: //class members
+				case 1: // class members
 					if(currentClass.isEmpty()) {
 						if(ignoreErrors) continue;
-						else throw new MalformedMappingsException(i, "class member without parent class");
+						else throw new MalformedMappingsException(i + 1, "class member without parent class");
 					}
 					switch(tokens[0].charAt(0)) {
-						case 'm': //methods
+						case 'm': // methods
 							if(tokens.length == 4)
-								break;
-							result.getClassData(currentClass).addMethod(tokens[2], tokens[3], tokens[1]);
+								result.getClassData(currentClass).addMethod(tokens[2], tokens[3], tokens[1]);
+							else if(!ignoreErrors)
+								throw new MalformedMappingsException(i + 1, "incomplete method member");
 							continue;
-						case 'f': //fields
+						case 'f': // fields
 							if(tokens.length == 4)
-								break;
-							result.getClassData(currentClass).addField(tokens[2], tokens[3], tokens[1]);
+								result.getClassData(currentClass).addField(tokens[2], tokens[3], tokens[1]);
+							else if(!ignoreErrors)
+								throw new MalformedMappingsException(i + 1, "incomplete field member");
 							continue;
 					}
 					break;
-				case 2: //parameters, our mappers don't really support those
-					break;
+				case 2: // parameters, our mappers don't really support those
+					continue;
+				default:
+					if(tokens[0].charAt(0) == 'c')
+						continue; // skip comments
+					if(!ignoreErrors)
+						throw new MalformedMappingsException(i + 1, "wrong number of tab-separated tokens");
 			}
-			if(!ignoreErrors)
-				throw new MalformedMappingsException(i, "wrong number of tab-separated tokens");
 		}
 		return result;
 	}

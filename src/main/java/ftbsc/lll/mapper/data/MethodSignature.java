@@ -18,7 +18,7 @@ public class MethodSignature {
 
 	/**
 	 * Constructs a new {@link MethodSignature}. The parameters should be
-	 * either plain or obfuscated in the same way;
+	 * either plain or mapped in the same way;
 	 * @param name       the method name
 	 * @param descriptor the method descriptor
 	 */
@@ -37,7 +37,7 @@ public class MethodSignature {
 		if(this == o) return true;
 		if(o == null || getClass() != o.getClass()) return false;
 		MethodSignature signature = (MethodSignature) o;
-		return Objects.equals(name, signature.name) && Objects.equals(descriptor, signature.descriptor);
+		return Objects.equals(this.name, signature.name) && Objects.equals(this.descriptor, signature.descriptor);
 	}
 
 	/**
@@ -46,6 +46,6 @@ public class MethodSignature {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, descriptor);
+		return Objects.hash(this.name, this.descriptor);
 	}
 }

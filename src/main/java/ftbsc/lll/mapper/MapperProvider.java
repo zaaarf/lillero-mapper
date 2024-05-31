@@ -36,7 +36,7 @@ public class MapperProvider {
 	 */
 	private void loadMappers() {
 		this.loadedMappers = new HashSet<>();
-		for(IMappingFormat mapper: ServiceLoader.load(IMappingFormat.class))
+		for(IMappingFormat mapper: ServiceLoader.load(IMappingFormat.class, this.getClass().getClassLoader()))
 			this.loadedMappers.add(mapper);
 		if(this.loadedMappers.isEmpty())
 			throw new RuntimeException("Something went wrong: no mapper types were loaded successfully!");
@@ -79,7 +79,9 @@ public class MapperProvider {
 			}
 		}
 
-		return new BufferedReader(new InputStreamReader(targetStream,
-			StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+		return new BufferedReader(new InputStreamReader(
+			targetStream,
+			StandardCharsets.UTF_8)
+		).lines().collect(Collectors.toList());
 	}
 }

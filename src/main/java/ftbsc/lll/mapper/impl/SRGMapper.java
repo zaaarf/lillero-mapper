@@ -78,17 +78,17 @@ public class SRGMapper implements IMappingFormat {
 		String[] split = tokens[1].split("/");
 		String memberName = split[split.length - 1];
 		String parent = tokens[1].substring(0, tokens[1].length() - split[split.length - 1].length() - 1);
-		int obfPosition = field ? 2 : 3;
-		split = tokens[obfPosition].split("/");
-		String memberNameObf = split[split.length - 1];
-		String parentObf = tokens[obfPosition].substring(0, tokens[obfPosition].length() - split[split.length - 1].length() - 1);
-		this.registerMember(mapper, invertedMapper, parent, parentObf, memberName, memberNameObf,
+		int mappedPosition = field ? 2 : 3;
+		split = tokens[mappedPosition].split("/");
+		String memberNameMapped = split[split.length - 1];
+		String parentMapped = tokens[mappedPosition].substring(0, tokens[mappedPosition].length() - split[split.length - 1].length() - 1);
+		this.registerMember(mapper, invertedMapper, parent, parentMapped, memberName, memberNameMapped,
 			field ? null : tokens[2], field ? null : tokens[4]);
 		return true;
 	}
 
 	/**
-	 * Registers a class in the mapper, if it isn't already.
+	 * Registers a class in the mapper, if it isn't already known.
 	 * @param mapper the {@link Mapper} with normal mappings
 	 * @param invertedMapper the {@link Mapper} with inverted mappings
 	 * @param name the name
@@ -118,12 +118,10 @@ public class SRGMapper implements IMappingFormat {
 		this.registerClass(mapper, invertedMapper, parent, parentMapped);
 		ClassData data = mapper.getClassData(parent);
 		ClassData dataReverse = invertedMapper.getClassData(data.nameMapped);
-		if(descriptor == null || descriptorMapped == null) {
-			//field
+		if(descriptor == null || descriptorMapped == null) { // field
 			data.addField(name, nameMapped);
 			dataReverse.addField(nameMapped, name);
-		} else {
-			//method
+		} else { // method
 			data.addMethod(name, nameMapped, descriptor);
 			dataReverse.addMethod(nameMapped, name, descriptorMapped);
 		}

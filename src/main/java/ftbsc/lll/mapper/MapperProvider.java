@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The main class of the mapper library. It loads all the
@@ -30,7 +29,7 @@ public class MapperProvider {
 	/**
 	 * A {@link Set} containing all the loaded mapper classes.
 	 */
-	private Set<Class<? extends IMappingFormat>> loadedMappers = null;
+	private Set<IMappingFormat> loadedMappers = null;
 
 	/**
 	 * Loads the mapper classes into a {@link Set}.
@@ -38,7 +37,7 @@ public class MapperProvider {
 	private void loadMappers() {
 		this.loadedMappers = new HashSet<>();
 		for(IMappingFormat mapper: ServiceLoader.load(IMappingFormat.class))
-			this.loadedMappers.add(mapper.getClass());
+			this.loadedMappers.add(mapper);
 		if(this.loadedMappers.isEmpty())
 			throw new RuntimeException("Something went wrong: no mapper types were loaded successfully!");
 	}
@@ -54,12 +53,7 @@ public class MapperProvider {
 		if(getInstance().loadedMappers == null)
 			getInstance().loadMappers();
 		return getInstance().loadedMappers.stream()
-			.flatMap(clazz -> {
-				try {
-					return Stream.of(clazz.newInstance());
-				} catch(ReflectiveOperationException ignored) {}
-				return Stream.empty();
-			}).filter(m -> m.claim(data))
+			.filter(m -> m.claim(data))
 			.max(Comparator.comparingInt(IMappingFormat::priority))
 			.orElseThrow(InvalidResourceException::new);
 	}

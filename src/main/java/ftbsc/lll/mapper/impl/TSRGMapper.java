@@ -24,7 +24,7 @@ public class TSRGMapper implements IMappingFormat {
 	}
 
 	@Override
-	public Mapper getMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+	public Mapper getMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException {
 		Mapper result = new Mapper();
 		String currentClass = "";
 		for(int i = 1; i < lines.size(); i++) { //start from 1 to skip header

@@ -112,9 +112,16 @@ public class SRGMapper implements IMappingFormat {
 	 * @param descriptor the member's plain descriptor, may be null
 	 * @param descriptorMapped the member's mapped descriptor, may be null
 	 */
-	private void registerMember(Mapper mapper, Mapper invertedMapper, String parent,
-															String parentMapped, String name, String nameMapped,
-															String descriptor, String descriptorMapped) {
+	private void registerMember(
+		Mapper mapper,
+		Mapper invertedMapper,
+		String parent,
+		String parentMapped,
+		String name,
+		String nameMapped,
+		String descriptor,
+		String descriptorMapped
+	) {
 		this.registerClass(mapper, invertedMapper, parent, parentMapped);
 		ClassData data = mapper.getClassData(parent);
 		ClassData dataReverse = invertedMapper.getClassData(data.nameMapped);
@@ -128,12 +135,12 @@ public class SRGMapper implements IMappingFormat {
 	}
 
 	@Override
-	public Mapper getMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+	public Mapper getMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException {
 		return this.buildMapper(lines, ignoreErrors, false);
 	}
 
 	@Override
-	public Mapper getInvertedMapper(List<String> lines, boolean ignoreErrors) {
+	public Mapper getInvertedMapper(List<String> lines, String from, String to, boolean ignoreErrors) {
 		return this.buildMapper(lines, ignoreErrors, true);
 	}
 }

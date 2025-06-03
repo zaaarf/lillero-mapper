@@ -23,14 +23,14 @@ public class MultiMapper implements IMappingFormat {
 	}
 
 	@Override
-	public Mapper getMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
+	public Mapper getMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException {
 		Mapper result = new Mapper();
 		List<Mapper> mapperList = new ArrayList<>();
 
 		for(int i = 1; i < lines.size(); i++) {
 			List<String> data = MapperProvider.fetchFromLocalOrRemote(lines.get(i));
 			IMappingFormat format = MapperProvider.getMapper(data);
-			mapperList.add(format.getMapper(data, ignoreErrors));
+			mapperList.add(format.getMapper(data, from, to, ignoreErrors));
 		}
 
 		mapperList.get(0).getRawMappings().forEach((name, data) -> {

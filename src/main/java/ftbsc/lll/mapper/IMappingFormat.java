@@ -30,21 +30,25 @@ public interface IMappingFormat {
 	/**
 	 * Creates a {@link Mapper} given the lines, ignoring errors depending on the given flag.
 	 * @param lines the lines to read
+	 * @param from the namespace to map from (ignored in formats with no namespaces)
+	 * @param to the namespace to map to (ignored in formats with no namespaces)
 	 * @param ignoreErrors try to ignore errors and keep going
 	 * @return the {@link Mapper}
 	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
 	 */
-	Mapper getMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException;
+	Mapper getMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException;
 
 	/**
 	 * Creates a {@link Mapper} given the lines, ignoring errors depending on the given flag, and
 	 * returns its inverted form.
 	 * @param lines the lines to read
+	 * @param from the namespace to map from (ignored in formats with no namespaces)
+	 * @param to the namespace to map to (ignored in formats with no namespaces)
 	 * @param ignoreErrors try to ignore errors and keep going
 	 * @return the inverted {@link Mapper}
 	 * @throws MalformedMappingsException if an error is encountered and ignoreErrors is false
 	 */
-	default Mapper getInvertedMapper(List<String> lines, boolean ignoreErrors) throws MalformedMappingsException {
-		return this.getMapper(lines, ignoreErrors).getInverted();
+	default Mapper getInvertedMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException {
+		return this.getMapper(lines, from, to, ignoreErrors).getInverted();
 	}
 }

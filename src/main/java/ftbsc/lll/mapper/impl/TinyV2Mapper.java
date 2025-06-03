@@ -40,8 +40,17 @@ public class TinyV2Mapper implements IMappingFormat {
 			namespaceCount++;
 		}
 
+		if(namespaceCount < 2) {
+			throw new MalformedMappingsException(0, "not enough namespaces");
+		}
+
 		if(namespaceFrom == -1 || namespaceTo == -1) {
-			throw new MalformedMappingsException(0, "missing requested namespace");
+			if(namespaceCount == 2 && from == null && to == null) { // fallback for legacy compatibility
+				namespaceFrom = 0;
+				namespaceTo = 1;
+			} else {
+				throw new MalformedMappingsException(0, "missing requested namespace");
+			}
 		}
 
 		for(int i = 1; i < lines.size(); i++) {

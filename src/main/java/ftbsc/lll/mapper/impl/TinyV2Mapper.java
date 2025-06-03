@@ -15,8 +15,8 @@ import java.util.regex.Pattern;
  */
 @AutoService(IMappingFormat.class)
 public class TinyV2Mapper implements IMappingFormat {
-	private static final Pattern HEADER_REGEX = Pattern.compile("tiny\t2\t[0-9]\t(([a-zA-Z]*)\t?)+");
-	private static final Pattern NAMESPACE_REGEX = Pattern.compile("([a-zA-Z]*)\t?");
+	private static final Pattern HEADER_REGEX = Pattern.compile("tiny\t2\t[0-9]\t((([a-zA-Z]+)\t?)+)");
+	private static final Pattern NAMESPACE_REGEX = Pattern.compile("([a-zA-Z]+)\t?");
 
 	@Override
 	public boolean claim(List<String> lines) {
@@ -26,15 +26,17 @@ public class TinyV2Mapper implements IMappingFormat {
 	@Override
 	public Mapper getMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException {
 		Mapper result = new Mapper();
-		String currentClass = "";
-		String header = HEADER_REGEX.matcher(lines.get(0)).group(1);
-		Matcher namespaceMatcher = NAMESPACE_REGEX.matcher(header);
 
+		Matcher headerMatcher = HEADER_REGEX.matcher(lines.get(0));
+		headerMatcher.find();
+		String header = headerMatcher.group(1);
+
+		Matcher namespaceMatcher = NAMESPACE_REGEX.matcher(header);
 		int namespaceCount = 0;
 		int namespaceFrom = -1, namespaceTo = -1;
 
 		while (namespaceMatcher.find()) {
-			String ns = namespaceMatcher.group(1);
+			String ns = namespaceMatcher.group(1).trim();
 			if(ns.equals(from)) namespaceFrom = namespaceCount;
 			else if(ns.equals(to)) namespaceTo = namespaceCount;
 			namespaceCount++;
@@ -53,6 +55,7 @@ public class TinyV2Mapper implements IMappingFormat {
 			}
 		}
 
+		String currentClass = "";
 		for(int i = 1; i < lines.size(); i++) {
 			String currentLine = lines.get(i);
 			String[] tokens = currentLine.trim().split("\t");

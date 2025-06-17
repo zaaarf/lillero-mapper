@@ -20,11 +20,11 @@ javadoc {
 
 repositories {
     mavenCentral()
-	maven { url = 'https://maven.fantabos.co' }
+	maven { url = 'https://maven.zaaarf.foo' }
 }
 
 dependencies {
-	implementation 'ftbsc:lll:0.5.1'
+	implementation 'ftbsc:lll:0.6.1'
 	implementation 'com.google.auto.service:auto-service-annotations:1.1.0'
 	annotationProcessor 'com.google.auto.service:auto-service:1.1.0'
 }

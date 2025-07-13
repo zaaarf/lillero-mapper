@@ -3,8 +3,12 @@ package ftbsc.lll.mapper.impl;
 import com.google.auto.service.AutoService;
 import ftbsc.lll.exceptions.MalformedMappingsException;
 import ftbsc.lll.mapper.IMappingFormat;
+import ftbsc.lll.mapper.data.FieldData;
+import ftbsc.lll.mapper.data.MethodData;
+import ftbsc.lll.mapper.data.MethodSignature;
 import ftbsc.lll.mapper.utils.Mapper;
 import ftbsc.lll.mapper.data.ClassData;
+import ftbsc.lll.mapper.utils.MappingUtils;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -25,8 +29,6 @@ public class TinyV2Mapper implements IMappingFormat {
 
 	@Override
 	public Mapper getMapper(List<String> lines, String from, String to, boolean ignoreErrors) throws MalformedMappingsException {
-		Mapper result = new Mapper();
-
 		Matcher headerMatcher = HEADER_REGEX.matcher(lines.get(0));
 		headerMatcher.find();
 		String header = headerMatcher.group(1);
@@ -35,7 +37,7 @@ public class TinyV2Mapper implements IMappingFormat {
 		int namespaceCount = 0;
 		int namespaceFrom = -1, namespaceTo = -1;
 
-		while (namespaceMatcher.find()) {
+		while(namespaceMatcher.find()) {
 			String ns = namespaceMatcher.group(1).trim();
 			if(ns.equals(from)) namespaceFrom = namespaceCount;
 			else if(ns.equals(to)) namespaceTo = namespaceCount;
@@ -55,6 +57,51 @@ public class TinyV2Mapper implements IMappingFormat {
 			}
 		}
 
+		Mapper mapper = new Mapper();
+		populateMapper(mapper, lines, namespaceCount, namespaceFrom, namespaceTo, ignoreErrors);
+
+		// we need a second "bridge" mapper that will act as a (temporary) bridge between ns #1
+		// (which is used to express descriptors) and whatever "from" is
+		Mapper bridge = new Mapper();
+		populateMapper(bridge, lines, namespaceCount, 0, namespaceFrom, ignoreErrors);
+
+		Mapper result = new Mapper();
+		for(String nameMapped : mapper.getRawMappings().keySet()) {
+			ClassData mapperData = mapper.getClassData(nameMapped);
+			ClassData resultData = new ClassData(mapperData.name, mapperData.nameMapped);
+
+			for(MethodSignature signature : mapperData.getMethods().keySet()) {
+				MethodData md = mapperData.getMethods().get(signature);
+				resultData.addMethod(
+					md.signature.name,
+					md.nameMapped,
+					MappingUtils.mapMethodDescriptor(md.signature.descriptor, bridge, false)
+				);
+			}
+
+			for(String field : mapperData.getFields().keySet()) {
+				FieldData fd = mapperData.mapField(field);
+				if(fd.descriptor != null) {
+					resultData.addField(fd.name, fd.nameMapped, MappingUtils.mapMethodDescriptor(fd.descriptor, bridge, false));
+				} else {
+					resultData.addField(fd.name, fd.nameMapped);
+				}
+			}
+
+			result.getRawMappings().put(resultData.name, resultData);
+		}
+
+		return result;
+	}
+
+	private static void populateMapper(
+		Mapper mapper,
+		List<String> lines,
+		int namespaceCount,
+		int namespaceFrom,
+		int namespaceTo,
+		boolean ignoreErrors
+	) {
 		String currentClass = "";
 		for(int i = 1; i < lines.size(); i++) {
 			String currentLine = lines.get(i);
@@ -65,7 +112,7 @@ public class TinyV2Mapper implements IMappingFormat {
 					if(tokens.length == 1 + namespaceCount) {
 						if(tokens[0].charAt(0) == 'c') {
 							currentClass = tokens[1 + namespaceFrom];
-							result.getRawMappings().put(currentClass, new ClassData(currentClass, tokens[1 + namespaceTo]));
+							mapper.getRawMappings().put(currentClass, new ClassData(currentClass, tokens[1 + namespaceTo]));
 						} else if(!ignoreErrors)
 							throw new MalformedMappingsException(i + 1, "root-level element must be class");
 						continue;
@@ -78,28 +125,26 @@ public class TinyV2Mapper implements IMappingFormat {
 					}
 					switch(tokens[0].charAt(0)) {
 						case 'm': // methods
-							if(tokens.length == 2 + namespaceCount)
-								result.getClassData(currentClass).addMethod(tokens[2 + namespaceFrom], tokens[2 + namespaceTo], tokens[1]);
-							else if(!ignoreErrors)
-								throw new MalformedMappingsException(i + 1, "incomplete method member");
+							if(tokens.length == 2 + namespaceCount) {
+								mapper.getClassData(currentClass).addMethod(tokens[2 + namespaceFrom], tokens[2 + namespaceTo], tokens[1]);
+							} else if(!ignoreErrors) throw new MalformedMappingsException(i + 1, "incomplete method member");
 							continue;
 						case 'f': // fields
-							if(tokens.length == 2 + namespaceCount)
-								result.getClassData(currentClass).addField(tokens[2 + namespaceFrom], tokens[2 + namespaceTo], tokens[1]);
-							else if(!ignoreErrors)
-								throw new MalformedMappingsException(i + 1, "incomplete field member");
+							if(tokens.length == 2 + namespaceCount) {
+								mapper.getClassData(currentClass).addField(tokens[2 + namespaceFrom], tokens[2 + namespaceTo], tokens[1]);
+							} else if(!ignoreErrors) throw new MalformedMappingsException(i + 1, "incomplete field member");
 							continue;
 					}
 					break;
 				case 2: // parameters, our mappers don't really support those
 					continue;
 				default:
-					if(tokens[0].charAt(0) == 'c')
+					if(tokens[0].charAt(0) == 'c') {
 						continue; // skip comments
-					if(!ignoreErrors)
-						throw new MalformedMappingsException(i + 1, "wrong number of tab-separated tokens");
+					}
+
+					if(!ignoreErrors) throw new MalformedMappingsException(i + 1, "wrong number of tab-separated tokens");
 			}
 		}
-		return result;
 	}
 }

@@ -9,6 +9,7 @@ import ftbsc.lll.mapper.data.MethodSignature;
 import ftbsc.lll.mapper.utils.Mapper;
 import ftbsc.lll.mapper.data.ClassData;
 import ftbsc.lll.mapper.utils.MappingUtils;
+import org.objectweb.asm.Type;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -82,10 +83,14 @@ public class TinyV2Mapper implements IMappingFormat {
 			for(String field : mapperData.getFields().keySet()) {
 				FieldData fd = mapperData.mapField(field);
 				if(fd.descriptor != null) {
-					resultData.addField(fd.name, fd.nameMapped, MappingUtils.mapMethodDescriptor(fd.descriptor, bridge, false));
-				} else {
-					resultData.addField(fd.name, fd.nameMapped);
+					Type type = MappingUtils.mapType(Type.getType(fd.descriptor), bridge, false);
+					if(type.getSort() >= Type.ARRAY) {
+						resultData.addField(fd.name, fd.nameMapped, type.getInternalName());
+						continue;
+					}
 				}
+
+				resultData.addField(fd.name, fd.nameMapped);
 			}
 
 			result.getRawMappings().put(resultData.name, resultData);

@@ -37,7 +37,7 @@ public class MappingUtils {
 	 * @return the mapped type
 	 */
 	public static Type mapType(Type type, Mapper mapper, boolean reverse) {
-		//unwrap arrays
+		// unwrap arrays
 		Type unwrapped = type;
 		int arrayLevel = 0;
 		while(unwrapped.getSort() == Type.ARRAY) {
@@ -45,7 +45,7 @@ public class MappingUtils {
 			arrayLevel++;
 		}
 
-		//if it's a primitive no operation is needed
+		// if it's a primitive no operation is needed
 		if(type.getSort() < Type.ARRAY)
 			return type;
 

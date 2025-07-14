@@ -83,14 +83,14 @@ public class TinyV2Mapper implements IMappingFormat {
 			for(String field : mapperData.getFields().keySet()) {
 				FieldData fd = mapperData.mapField(field);
 				if(fd.descriptor != null) {
-					Type type = MappingUtils.mapType(Type.getType(fd.descriptor), bridge, false);
-					if(type.getSort() >= Type.ARRAY) {
-						resultData.addField(fd.name, fd.nameMapped, type.getInternalName());
-						continue;
-					}
+					resultData.addField(
+						fd.name,
+						fd.nameMapped,
+						MappingUtils.mapType(Type.getType(fd.descriptor), bridge, false).getDescriptor()
+					);
+				} else {
+					resultData.addField(fd.name, fd.nameMapped);
 				}
-
-				resultData.addField(fd.name, fd.nameMapped);
 			}
 
 			result.getRawMappings().put(resultData.name, resultData);

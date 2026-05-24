@@ -1,6 +1,15 @@
 # Lillero-mapper
 A tiny library to process mappings in various formats.
 
+## Archival note
+It's been fun (not really, at least not this part), but I've reached a point where this library is lagging behind the purpose it was designed for (that being
+providing [lillero-processor](https://github.com/zaaarf/lillero-processor) with obfuscation capabilities). I want the processor to be able to support an
+increasing number of formats, but I also _really_ don't want the maintenance burden to come with that. Right around the time this realization hit me, I discovered
+that [mapping-io](https://github.com/FabricMC/mapping-io) existed all along, which in turn means that I can get the functionality I need without implementing,
+testing and debugging a number of _extremely_ janky parsers for formats that I don't even fully understand and whose spec, if one exists, I've never read.
+
+I liked my own API better, but it's just not worth the effort. So long! The text below is all from the original readme.
+
 ## Why?
 I initially [meant to fork Enigma](https://github.com/FabricMC/Enigma), but honestly it was far more than I needed, even when stripped down to its core library.
 
